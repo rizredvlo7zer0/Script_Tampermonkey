@@ -1,0 +1,33 @@
+// ==UserScript==
+// @name         Auto Scrolling
+// @author       @Modz_Riz
+// @namespace    https://viayoo.com/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @run-at       document-start
+// @match        https://*/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+    
+    // Define the speed of scrolling
+    var scrollSpeed = 1;
+    
+    // Start scrolling the page
+    function startScrolling() {
+        // Get the current scroll position
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Scroll the page by the defined speed
+        window.scrollTo(0, scrollTop + scrollSpeed);
+        
+        // Schedule the next scroll operation
+        setTimeout(startScrolling, 10);
+    }
+    
+    // Start scrolling the page when the document is ready
+    window.addEventListener('DOMContentLoaded', startScrolling);
+})();
