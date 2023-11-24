@@ -1,0 +1,84 @@
+// ==UserScript==
+// @name         Pull-to Refresh
+// @namespace    https://viayoo.com/
+// @version      0.1
+// @description  Try to take over the world!
+// @author       @Modz_Riz
+// @run-at       document-start
+// @match        https://*/*
+// @grant        none
+// ==/UserScript==
+
+(function () {
+  const min_dY = 175; // Jarak tarik-Pemicu(px)
+  const key = encodeURIComponent('Tarik ke bawah untuk menyegarkan');
+
+  if (window[key]) {
+    return;
+  }
+
+  try {
+    window[key] = true;
+
+    let strtX, strtY = 0,
+      rchTp, onePt = false;
+
+    document.addEventListener('touchstart', function (e) {
+      if (onePt) {
+        rchTp = false;
+      } else {
+        onePt = true;
+        rchTp = (document.body.scrollTop || document.documentElement.scrollTop) < 50;
+        strtX = e.touches[0].screenX;
+        strtY = e.touches[0].screenY;
+      }
+    }, {
+      passive: true
+    });
+
+    document.addEventListener('touchend', function (e) {
+      if (rchTp) {
+        const dY = Math.floor(e.changedTouches[0].screenY - strtY);
+        if (dY > min_dY && Math.abs(e.changedTouches[0].screenX - strtX) < 0.4 * dY) {
+          // Add an animated circle element during loading
+          const loadingElement = document.createElement('div');
+          loadingElement.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">' +
+            '<div class="loading-circle"></div>ㅤ' +
+            '<h1>Loading...</h1></div>';
+          document.body.innerHTML = '';
+          document.body.appendChild(loadingElement);
+
+          // Simulate loading delay and then reload
+          setTimeout(function () {
+            location.reload();
+          }, 500);
+        }
+        rchTp = false;
+      }
+      onePt = false;
+    }, {
+      passive: true,
+      capture: true
+    });
+  } catch (err) {
+    console.log('Tarik ke bawah untuk menyegarkan:', err);
+  }
+})();
+
+// Style for the loading circle
+const style = document.createElement('style');
+style.textContent = `
+  .loading-circle {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #333333;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }`;
+document.head.appendChild(style);
